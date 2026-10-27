@@ -6,7 +6,7 @@ To build next: Next.js UI (pages in the spec), Zod-validated server actions, rat
 
 ## Setup
 1. Create a Supabase project. Auth → enable Email provider with "Confirm email" ON; set Site URL and redirect URLs.
-2. In the Supabase SQL Editor, run the files in `supabase/migrations/` in numeric order (`0001` through `0005`), or run `supabase db push`.
+2. In the Supabase SQL Editor, run the files in `supabase/migrations/` in numeric order (`0001` through `0005`), or link this repository once with `supabase link --project-ref <project-ref>` and then run `supabase db push` from the repository root.
 3. Copy `.env.example` to `.env.local` and fill the values. Keep the service-role key server-side only.
 4. Campus names are typed during registration. Existing campus records remain available; matching typed names are linked automatically.
 5. Migration `0004_competition_schedule.sql` sets the 2026 schedule: submissions close October 31, voting opens November 1 and closes at the start of November 2, and results are announced November 2.
