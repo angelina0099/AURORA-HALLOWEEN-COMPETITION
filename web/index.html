@@ -119,7 +119,7 @@ rules(){return`<section class="rules-hero"><p class="rules-kicker">AURORA · EMs
  </div></section>
  <section class="rules-section privacy-note"><p class="rules-kicker">Your information, respected</p><h2>Privacy &amp; photo display</h2><p>We collect your name, email, phone number and campus to administer the competition. Your email address and phone number are not shown publicly. Approved entries appear with your first name and last initial alongside your photos.</p><p>For privacy questions or a deletion request, contact <a href="mailto:${h(S.contact_email||'')}">${h(S.contact_email||'the competition team')}</a>.</p></section>
  <div class="rules-cta"><p class="tag">Your imagination is the main event.</p><a class="btn" href="#/${me?'dash':'register'}">Enter the competition</a>${me?'<a class="btn ghost" href="#/gallery">Explore the gallery &amp; vote</a>':''}</div>`},
-async register(){setTimeout(()=>$('#rf').onsubmit=reg);return shell('Register',`<form id="rf" novalidate>${fld('full_name','Full name','text','autocomplete=name')}${fld('email','Email','email','autocomplete=email')}${fld('phone','Phone (+212… or 06…)','tel')}
+async register(){setTimeout(()=>$('#rf').onsubmit=reg);return shell('Register',`<form id="rf" novalidate>${fld('full_name','Full name','text','autocomplete=name maxlength=100')}${fld('email','Email','email','autocomplete=email')}${fld('phone','Phone (+212… or 06…)','tel','maxlength=30')}
  ${fld('campus','Campus','text','autocomplete=organization maxlength=100 placeholder="Type your campus name"')}
  ${fld('pw','Password (10+ chars, letter &amp; number)','password','autocomplete=new-password')}${fld('pw2','Confirm password','password')}
  <label style="text-transform:none;letter-spacing:0"><input type="checkbox" id="ok" style="width:auto"> I accept the <a href="#/rules">rules and privacy policy</a></label><div class="err" id="e_ok"></div><button class="btn" ${regOpen()?'':'disabled'}>Create account</button></form>`)},
@@ -173,16 +173,32 @@ function draw(){const{g,u}=window._g;let l=g.filter(x=>x.display_name.toLowerCas
   const{data,error}=await sb.rpc('cast_vote',{p_submission:x.id});if(error||!data?.ok)return toast(ERR[data?.error]||'Vote failed. Please try again.');
   toast('Your vote is recorded. Thank you!');route()})}
 
+function signupError(error){const code=String(error?.code||'').toLowerCase(),message=String(error?.message||'').toLowerCase(),status=Number(error?.status);
+ if(code.includes('already')||code.includes('email_exists')||message.includes('already registered')||message.includes('already exists'))return'An account may already use this email. Try logging in or resetting your password.';
+ if(message.includes('normalized_phone')||message.includes('phone')&&message.includes('duplicate'))return'This phone number is already registered. Log in or use a different number.';
+ if(message.includes('normalized_email')||message.includes('email')&&message.includes('duplicate'))return'This email is already registered. Try logging in or resetting your password.';
+ if(code.includes('weak_password')||message.includes('password should'))return'Choose a stronger password with at least 10 characters, including a letter and a number.';
+ if(code.includes('signup_disabled')||message.includes('signups not allowed'))return'Registration is currently unavailable. Please contact the competition team.';
+ if(status===429||code.includes('rate_limit')||message.includes('rate limit'))return'Too many signup attempts. Wait a few minutes, then try again.';
+ if(message.includes('redirect')&&message.includes('allow'))return'The signup confirmation redirect is not configured. Please contact the competition team.';
+ if(status>=500||message.includes('database error saving new user')||message.includes('profiles_'))return'We could not save your participant details. Check that your phone number is not already registered and that your name and campus are valid. If it persists, contact the competition team.';
+ if(status>=400)return'The registration service rejected these details. Check your email, phone number, and password, then try again.';
+ return'Could not reach the registration service. Check your connection and try again.'}
+
 async function reg(e){e.preventDefault();document.querySelectorAll('.err').forEach(x=>x.textContent='');const E=(k,m)=>($('#e_'+k).textContent=m,1);let bad=0;
  let ph=val('phone').replace(/[\s().-]/g,'');if(/^0[5-7]\d{8}$/.test(ph))ph='+212'+ph.slice(1);else if(ph.startsWith('00'))ph='+'+ph.slice(2);
- if(val('full_name').length<2)bad=E('full_name','Enter your full name.');if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email')))bad=E('email','Enter a valid email.');
+ const name=val('full_name'),email=val('email').toLowerCase();if(name.length<2)bad=E('full_name','Enter your full name.');else if(name.length>100)bad=E('full_name','Name must be 100 characters or fewer.');if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))bad=E('email','Enter a valid email.');
  if(!/^\+[1-9]\d{7,14}$/.test(ph))bad=E('phone','Enter a valid Moroccan or international number.');
  const campus=val('campus');if(!campus)bad=E('campus','Enter your campus name.');else if(campus.length>100)bad=E('campus','Campus name must be 100 characters or fewer.');
  const p=$('#pw').value;if(p.length<10||!/[A-Za-z]/.test(p)||!/\d/.test(p))bad=E('pw','At least 10 characters with a letter and a number.');if(p!==$('#pw2').value)bad=E('pw2','Passwords do not match.');
  if(!$('#ok').checked)bad=E('ok','You must accept the rules and privacy policy.');if(bad)return;
- const{error}=await sb.auth.signUp({email:val('email').toLowerCase(),password:p,options:{emailRedirectTo:`${location.origin}${location.pathname}?email-confirmed=1`,data:{full_name:val('full_name'),phone:ph,campus_name:campus}}});
- if(error)return $('#e_ok').textContent='We could not create this account. If you already registered, try logging in.';
- app.innerHTML=shell('Check your inbox','<p>We sent a verification link. Verify your email, then log in.</p>')}
+ const button=$('#rf button');button.disabled=true;button.textContent='Creating account…';
+ try{const{data,error}=await sb.auth.signUp({email,password:p,options:{emailRedirectTo:`${location.origin}${location.pathname}?email-confirmed=1`,data:{full_name:name,phone:ph,campus_name:campus}}});
+  if(error){console.error('Registration failed:',{code:error.code,status:error.status});$('#e_ok').textContent=signupError(error);return}
+  if(data.user?.identities?.length===0){$('#e_ok').textContent='An account may already use this email. Try logging in or resetting your password.';return}
+  app.innerHTML=shell('Check your inbox','<p>We sent a verification link. Verify your email, then log in.</p>')
+ }catch(error){console.error('Registration request failed:',{name:error?.name});$('#e_ok').textContent=signupError(error)}
+ finally{if($('#rf button')){button.disabled=false;button.textContent='Create account'}}}
 
 function wireSub(s){const ok=['image/jpeg','image/png','image/webp'],max=(S.max_photo_mb||5)*1048576;
  const chk=f=>f&&(!ok.includes(f.type)?'Only JPEG, PNG or WebP.':f.size>max?`Max ${S.max_photo_mb||5} MB per photo.`:'');
