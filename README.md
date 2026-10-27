@@ -22,6 +22,7 @@ Clients cannot change `role`: column grants block it and the signup trigger alwa
 - One vote: `votes.voter_id` unique. Votes can only be written through `cast_vote()`, and direct insert is revoked.
 - No self-vote: checked in `cast_vote()` and again by a trigger on `votes`. Attempts are logged to `audit_logs`.
 - Hidden results: `get_results()` returns rows only if `results_published` is true or the caller is an admin.
+- Member gallery: browsing approved entries and their photos requires sign-in; vote eligibility is still checked by `cast_vote()`.
 
 ## Tests to write (Vitest + Supabase local)
 Duplicate email, role escalation attempt, second submission, self-vote, double vote, vote while closed,
@@ -33,7 +34,7 @@ For local builds, set those two variables in your shell and run `npm run build`.
 
 ## Deploy with GitHub and Vercel
 Import the GitHub repository into Vercel with the repository root as the project root. Vercel uses `npm run build` and publishes `dist/` as configured in `vercel.json`. Add `NEXT_PUBLIC_SUPABASE_URL` (`https://<project-ref>.supabase.co`) and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (the project's publishable/anon key) to the Vercel project's environment variables, then deploy. Do not add a service-role key to this static frontend.
-Run the migrations in numeric order before using the site. In Supabase Auth settings add your site URL to the redirect URLs.
+Run the migrations in numeric order before using the site. Migration `0006_authenticated_gallery.sql` restricts the approved-entry gallery and photo access to signed-in users; vote eligibility remains enforced by `cast_vote()`. In Supabase Auth settings add your site URL to the redirect URLs.
 Admin controls: Close competition now (reason required, voting stops, entries locked), change submission deadline, open/close voting, publish/hide results, approve/reject, suspend/reactivate. All are audited.
 
 ## Migration 0003, schedule, and tests
