@@ -1,0 +1,216 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AURORA Halloween Makeup Competition</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<style>
+:root{--bk:#090808;--ob:#141111;--bg:#281d1d;--wine:#5a3033;--rose:#c79793;--bl:#e6c7c1;--parch:#bb9a83;--iv:#f4ece4;--ch:#292321}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(ellipse at 80% 4%,#2b1718 0,transparent 34rem),var(--bk);color:var(--iv);font:16px/1.7 Inter,sans-serif;min-height:100vh}
+h1,h2,h3{font-family:Cinzel,serif;font-weight:400;color:var(--bl);letter-spacing:.055em;margin:.4em 0}
+.lbl{font:600 .72rem Cinzel,serif;letter-spacing:.3em;text-transform:uppercase;color:var(--rose)}
+a{color:var(--bl)}:focus-visible{outline:2px solid var(--rose);outline-offset:3px}
+nav{display:flex;align-items:center;gap:1.5rem;padding:.7rem max(1.2rem,calc((100vw - 1180px)/2));border-bottom:1px solid #C89A9833;flex-wrap:wrap;position:sticky;top:0;background:#090808eF;backdrop-filter:blur(16px);z-index:5}
+nav a{font:.68rem Cinzel,serif;letter-spacing:.16em;text-transform:uppercase;text-decoration:none;color:#d8c4bb;transition:color .2s}nav a:hover{color:#fff}
+nav .logo{display:flex;align-items:center;gap:.7rem;margin-right:auto;font-size:.85rem;letter-spacing:.28em}
+.brand-mark{width:42px;height:42px;object-fit:cover;border-radius:50%;border:1px solid #c7979366}
+main{max-width:1180px;margin:0 auto;padding:2rem 1.5rem 5rem}
+.hero{min-height:min(680px,78vh);display:grid;grid-template-columns:1.1fr .9fr;align-items:center;text-align:left;position:relative;border:1px solid #C89A9844;outline:1px solid #C89A9822;outline-offset:7px;margin:14px 0 5rem;padding:clamp(2rem,6vw,5.5rem);overflow:hidden;background:linear-gradient(115deg,#100d0df2 0%,#100d0dc9 54%,#241517b8 100%)}
+.hero h1{font-size:clamp(2.35rem,5.2vw,4.9rem);line-height:1.08;max-width:680px;margin:.5rem 0 1rem}.hero .big{font:clamp(1.1rem,2vw,1.55rem) Cinzel,serif;letter-spacing:.42em;color:var(--rose);margin:0}
+.hero-copy{position:relative;z-index:1}.hero-art{display:grid;place-items:center;position:relative;z-index:1;isolation:isolate}.hero-art:before,.hero-art:after{content:"";position:absolute;aspect-ratio:1;border:1px solid #c7979338;border-radius:50%;pointer-events:none}.hero-art:before{width:min(100%,430px);box-shadow:0 0 70px #c7979312,inset 0 0 45px #c797930c}.hero-art:after{width:min(88%,375px);border-style:dashed;border-color:#c7979328}.hero-logo{position:relative;z-index:1;width:min(100%,390px);aspect-ratio:1;object-fit:contain;border-radius:50%;mix-blend-mode:screen;filter:drop-shadow(0 0 42px #c797932b)}
+.hero-description{max-width:540px;color:#d2c3bc}.hero .tag{margin:.4rem 0}
+.hero-meta{display:flex;flex-wrap:wrap;align-items:center;gap:.5rem;margin:1.4rem 0;color:#d8b6ab}
+.hero-meta span{border:1px solid #c7979344;background:#09080866;padding:.4rem .65rem;font:.58rem Cinzel,serif;letter-spacing:.12em;line-height:1.6}
+.hero-meta .status-chip{border-color:#c7979390;background:#c7979318;color:var(--bl)}
+.hero-actions{display:flex;gap:.65rem;flex-wrap:wrap;margin-top:1.4rem}
+.section-heading{margin:4rem 0 1.5rem;text-align:center;font-size:clamp(1.5rem,3vw,2.15rem)}
+.steps .panel{min-height:175px}.steps .step-number{font:1rem Cinzel,serif;color:var(--rose);letter-spacing:.2em}
+.about-panel{display:grid;grid-template-columns:.35fr 1fr;align-items:center;gap:2rem;padding:clamp(1.5rem,5vw,3rem);margin:4rem 0}
+.about-emblem{width:min(100%,150px);border-radius:50%;mix-blend-mode:screen}
+.rules-hero{position:relative;overflow:hidden;padding:clamp(2rem,7vw,5.5rem);margin:1rem 0 2rem;border:1px solid #c7979355;background:radial-gradient(ellipse at 90% 0,#512d303b,transparent 32rem),linear-gradient(135deg,#171111,#0d0b0b 72%)}
+.rules-hero:after{content:"";position:absolute;width:clamp(190px,30vw,360px);aspect-ratio:1;right:-5rem;top:50%;transform:translateY(-50%);background:url("aurora-logo.png") center/contain no-repeat;opacity:.17;mix-blend-mode:screen;pointer-events:none}
+.rules-hero>*{position:relative;z-index:1}.rules-hero h1{font-size:clamp(2.25rem,6vw,4.3rem);line-height:1.1;max-width:680px}.rules-hero .tag{max-width:560px}
+.rules-kicker{font:.65rem Cinzel,serif;letter-spacing:.28em;text-transform:uppercase;color:var(--rose)}
+.rules-schedule{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem;margin:1.5rem 0 3rem}
+.schedule-card{padding:1.5rem;background:linear-gradient(145deg,#1a1414,#100e0e);border:1px solid #c7979344}
+.schedule-card .schedule-date{display:block;margin:.45rem 0;color:var(--bl);font:clamp(1.1rem,2.4vw,1.6rem) Cinzel,serif}
+.schedule-card p{margin:.25rem 0;color:#cbbab0;font-size:.88rem}
+.rules-section{margin:3rem 0}.rules-section>h2{font-size:clamp(1.35rem,3vw,2rem)}
+.rules-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:1rem}
+.rules-card{padding:1.35rem;border:1px solid #c7979330;background:linear-gradient(145deg,#171313,#100e0e)}
+.rules-card .rule-number{font:.64rem Cinzel,serif;letter-spacing:.2em;color:var(--rose)}
+.rules-card h3{margin:.5rem 0;color:var(--bl);font-size:1rem}
+.rules-card p{margin:.2rem 0;color:#cbbab0;font-size:.9rem}
+.privacy-note{padding:clamp(1.5rem,4vw,2.5rem);background:linear-gradient(145deg,#f5ede4,#e9daca);color:#211818;border:1px solid var(--parch)}
+.privacy-note h2,.privacy-note h3{color:var(--bg)}.privacy-note p{max-width:850px}
+.rules-cta{margin-top:2rem;text-align:center}
+.tag{font:italic 1.5rem 'Cormorant Garamond',serif;color:var(--parch)}
+.star{position:absolute;width:3px;height:3px;background:var(--bl);border-radius:50%;animation:tw 4s infinite ease-in-out}
+@keyframes tw{50%{opacity:.1}}@media(prefers-reduced-motion:reduce){.star{animation:none}*{scroll-behavior:auto!important}}
+.btn{display:inline-block;background:var(--wine);color:var(--iv);border:1px solid #c79793a8;padding:.8rem 1.35rem;font:.72rem Cinzel,serif;letter-spacing:.15em;text-transform:uppercase;cursor:pointer;text-decoration:none;margin:.2rem;transition:transform .2s,background .2s,border-color .2s}
+.btn:hover{background:#754247;border-color:var(--bl);transform:translateY(-2px)}.btn.ghost{background:transparent}.btn:disabled{opacity:.4;cursor:not-allowed}.btn.sm{padding:.4rem .8rem;font-size:.65rem}
+.panel{background:linear-gradient(145deg,#f5ede4,#e9daca);color:#211818;padding:1.5rem;border:1px solid var(--parch);box-shadow:0 12px 40px #0003;margin:1rem 0}
+.panel h2,.panel h3{color:var(--bg)}.dark{background:var(--ob);color:var(--iv);border-color:#C89A9844;box-shadow:none}.dark h2,.dark h3{color:var(--bl)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:1.2rem}
+.card{background:var(--ob);border:1px solid #C89A9855;transition:transform .3s,border-color .3s,box-shadow .3s}.card:hover{border-color:var(--rose);box-shadow:0 16px 40px #641F2738;transform:translateY(-4px)}
+.card img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;background:var(--ch)}.card div{padding:.8rem}
+label{display:block;font:.7rem Cinzel,serif;letter-spacing:.2em;text-transform:uppercase;margin:.9rem 0 .2rem}
+input,select,textarea{width:100%;padding:.65rem;background:#fff9;border:1px solid var(--parch);font:inherit;color:#1b1311}
+.dark input,.dark select,.dark textarea{background:var(--bk);color:var(--iv);border-color:#C89A9855}
+.err{color:#a3283a;font-size:.85rem;min-height:1em}.dark .err{color:#e08a96}
+.form{max-width:480px;margin:0 auto}.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem}
+.pill{border:1px solid var(--rose);padding:.1rem .7rem;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--bl)}
+table{width:100%;border-collapse:collapse;font-size:.85rem}td,th{padding:.5rem;border-bottom:1px solid #C89A9833;text-align:left;vertical-align:top}
+.stat{font:2rem Cinzel,serif;color:var(--rose)}.overflow{overflow-x:auto}
+dialog{background:var(--ob);color:var(--iv);border:1px solid var(--rose);max-width:420px;padding:1.5rem}dialog::backdrop{background:#000c}
+#toast{position:fixed;bottom:1rem;left:50%;transform:translateX(-50%);background:var(--wine);border:1px solid var(--rose);padding:.7rem 1.2rem;z-index:20;display:none}
+footer{text-align:center;padding:2rem;border-top:1px solid #C89A9833;color:var(--rose);font-size:.85rem}
+.thumbs img{width:110px;height:140px;object-fit:cover;border:1px solid var(--rose);margin:.3rem}
+.section-intro{text-align:center;color:#cbbab0;max-width:620px;margin:-.5rem auto 2rem}
+@media(max-width:760px){nav{gap:.65rem 1rem;padding:.65rem 1rem}nav .logo{width:100%;margin:0}nav a{font-size:.62rem;letter-spacing:.1em}main{padding:1rem 1rem 3rem}.hero{grid-template-columns:1fr;text-align:center;min-height:unset;padding:2rem 1.2rem;margin:8px 0 3rem}.hero-art{grid-row:1}.hero-art:before{width:min(100%,290px)}.hero-art:after{width:min(88%,254px)}.hero-logo{width:min(68vw,250px)}.hero-copy{grid-row:2}.hero h1{font-size:clamp(2rem,10vw,3.5rem)}.hero-meta{justify-content:center}.hero-actions{justify-content:center}.about-panel{grid-template-columns:1fr;text-align:center;justify-items:center;gap:.6rem}.about-emblem{width:100px}.section-heading{margin:3rem 0 1rem}}
+@media(max-width:600px){.rules-hero{padding:2rem 1.25rem}.rules-hero:after{right:-5.5rem;top:auto;bottom:-5rem;transform:none;width:220px}.rules-schedule{grid-template-columns:1fr;gap:.65rem;margin:1.25rem 0 2rem}.schedule-card{padding:1.15rem}.rules-section{margin:2rem 0}}
+@media(max-width:420px){nav{gap:.5rem .75rem}nav a{font-size:.57rem}.hero .lbl{font-size:.62rem;letter-spacing:.18em}.btn{font-size:.65rem;padding:.7rem 1rem}}
+</style></head><body>
+<nav id="nav"></nav><main id="app" aria-live="polite"></main>
+<footer><img class="brand-mark" src="aurora-logo.png" alt="Aurora emblem"><p>AURORA · <a href="#/rules">Rules &amp; Privacy</a> · <span id="contact"></span></p></footer>
+<dialog id="dlg"></dialog><div id="toast" role="status"></div>
+<script>
+// ===== CONFIG: paste your Supabase values (anon key is safe in the browser; NEVER the service-role key) =====
+const SB_URL='YOUR_SUPABASE_URL', SB_KEY='YOUR_SUPABASE_ANON_KEY';
+const sb=supabase.createClient(SB_URL,SB_KEY);
+const $=s=>document.querySelector(s), app=$('#app'); let me=null,prof=null,S={};
+const h=s=>String(s??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
+const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',4000)};
+const fmt=d=>d?new Date(d).toLocaleString([], {dateStyle:'medium',timeStyle:'short'}):'TBA';
+const now=()=>Date.now(), T=d=>d?new Date(d).getTime():null;
+const votingOpen=()=>S.voting_enabled&&(!S.voting_opens||now()>=T(S.voting_opens))&&(!S.voting_closes||now()<=T(S.voting_closes));
+const subsOpen=()=>!S.submission_deadline||now()<T(S.submission_deadline);
+const regOpen=()=>(!S.registration_opens||now()>=T(S.registration_opens))&&(!S.registration_closes||now()<=T(S.registration_closes));
+const status=()=>S.results_published?'Results published':votingOpen()?'Voting open':subsOpen()?'Submissions open':'Competition closed';
+const isAdmin=()=>prof?.role==='admin';
+const signed=async paths=>{const p=paths.filter(Boolean);if(!p.length)return{};const{data}=await sb.storage.from('submissions').createSignedUrls(p,3600);return Object.fromEntries((data||[]).map(x=>[x.path,x.signedUrl]))};
+const shell=(t,b)=>`<div class="panel form"><h2>${t}</h2>${b}</div>`;
+const fld=(id,l,t='text',x='')=>`<label for="${id}">${l}</label><input id="${id}" type="${t}" ${x}><div class="err" id="e_${id}"></div>`;
+const val=id=>$('#'+id)?.value.trim();
+function ask(html){return new Promise(r=>{const d=$('#dlg');d.innerHTML=html+'<p><button class="btn" id="y">Confirm</button><button class="btn ghost" id="n">Cancel</button></p>';d.showModal();$('#y').onclick=()=>{d.close();r(true)};$('#n').onclick=()=>{d.close();r(false)}})}
+
+async function load(){const{data}=await sb.from('competition_settings').select('*').single();S=data||{};
+ if(me){const{data:p}=await sb.from('profiles').select('*,campuses(name)').eq('id',me.id).single();prof=p}else prof=null;
+ $('#contact').textContent=S.contact_email||'';
+ $('#nav').innerHTML=`<a class="logo" href="#/"><img class="brand-mark" src="aurora-logo.png" alt="">AURORA</a><a href="#/">Home</a><a href="#/rules">The Competition</a><a href="#/gallery">Gallery &amp; Vote</a><a href="#/results">Results</a>`+
+ (me?`<a href="#/dash">My Account</a>${isAdmin()?'<a href="#/admin">Admin</a>':''}<a href="#" id="out">Logout</a>`:`<a href="#/login">Login</a>${regOpen()?'<a href="#/register">Register</a>':''}`);
+ $('#out')&&($('#out').onclick=async e=>{e.preventDefault();await sb.auth.signOut();location.hash='#/'})}
+
+const V={
+async home(){const st=Array.from({length:40},()=>`<i class="star" style="left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s"></i>`).join('');
+ const{data:f}=await sb.from('public_gallery').select('*').order('submitted_at',{ascending:false}).limit(4);const u=await signed((f||[]).map(x=>x.primary_photo_path));
+ return`<section class="hero">${st}<div class="hero-copy"><p class="big">AURORA · EMsi CLUB</p><h1>Beauty,<br>after dark.</h1><p class="tag">Where beauty meets the dark.</p><p class="hero-description">One look. One vision. An invitation to turn your boldest Halloween imagination into unforgettable artistry.</p>
+ <div class="hero-meta"><span class="status-chip">${h(status())}</span><span>Entries close · 31 October 2026</span><span>Results announced · 2 November 2026</span></div>
+ <div class="hero-actions"><a class="btn" href="#/${me?'dash':'register'}">Enter the competition</a><a class="btn ghost" href="#/gallery">Explore the gallery</a></div></div><div class="hero-art"><img class="hero-logo" src="aurora-logo.png" alt="Aurora EmSI Club emblem"></div></section>
+ <h2 class="section-heading">Your moment in the spotlight</h2><p class="section-intro">Three simple steps take your vision from inspiration to the Aurora gallery.</p><div class="steps">${['Create your account','Upload your Halloween makeup photos','Vote for your favorite eligible entries'].map((s,i)=>`<div class="panel"><span class="step-number">0${i+1} / THE JOURNEY</span><h3>${s}</h3></div>`).join('')}</div>
+ <div class="panel dark about-panel"><img class="about-emblem" src="aurora-logo.png" alt=""><div><p class="lbl">AURORA · EMsi CLUB</p><h2>Moments shared.<br>Memories cherished.</h2><p>A celebration of creativity, artistry and Halloween-inspired beauty, hosted by the AURORA club. Bring your vision to life and make this season unforgettable.</p></div></div>
+ <h2 class="section-heading">Featured entries</h2><p class="section-intro">Discover the artistry and imagination of our community.</p>${f?.length?`<div class="grid">${f.map(x=>card(x,u,false)).join('')}</div>`:'<p class="section-intro">No entries have been approved yet. The first looks will appear here.</p>'}`},
+rules(){return`<section class="rules-hero"><p class="rules-kicker">AURORA · EMsi Club · Competition guide</p><h1>Makeup artistry.<br>Made unforgettable.</h1><p class="tag">Your creative vision deserves its moment in the spotlight. Here is everything to know before you enter.</p></section>
+ <div class="rules-schedule"><article class="schedule-card"><span class="rules-kicker">01 · Entries close</span><strong class="schedule-date">31 October 2026</strong><p>Submit your completed look before the submission deadline.</p></article><article class="schedule-card"><span class="rules-kicker">02 · Results announced</span><strong class="schedule-date">2 November 2026</strong><p>Winners will be revealed after voting closes.</p></article></div>
+ <section class="rules-section"><p class="rules-kicker">The essentials</p><h2>Your competition, at a glance</h2><div class="rules-grid">
+ <article class="rules-card"><span class="rule-number">01 / ENTRY</span><h3>One entry per participant</h3><p>Create one account and submit one Halloween makeup look. You may include a primary photo and one optional second photo.</p></article>
+ <article class="rules-card"><span class="rule-number">02 / PHOTOS</span><h3>Show us your look</h3><p>Upload clear JPEG, PNG or WebP images. Each photo can be up to ${S.max_photo_mb||5} MB. Your entry can include up to two photos.</p></article>
+ <article class="rules-card"><span class="rule-number">03 / REVIEW</span><h3>Every entry is reviewed</h3><p>Entries are reviewed before appearing in the public gallery. Only approved looks are eligible for voting.</p></article>
+ <article class="rules-card"><span class="rule-number">04 / VOTING</span><h3>Cast your vote fairly</h3><p>Voting opens on 1 November 2026. Each verified participant gets one vote; you cannot vote for your own entry.</p></article>
+ </div></section>
+ <section class="rules-section privacy-note"><p class="rules-kicker">Your information, respected</p><h2>Privacy &amp; photo display</h2><p>We collect your name, email, phone number and campus to administer the competition. Your email address and phone number are not shown publicly. Approved entries appear with your first name and last initial alongside your photos.</p><p>For privacy questions or a deletion request, contact <a href="mailto:${h(S.contact_email||'')}">${h(S.contact_email||'the competition team')}</a>.</p></section>
+ <div class="rules-cta"><p class="tag">Your imagination is the main event.</p><a class="btn" href="#/${me?'dash':'register'}">Enter the competition</a><a class="btn ghost" href="#/gallery">Explore the gallery</a></div>`},
+async register(){setTimeout(()=>$('#rf').onsubmit=reg);return shell('Register',`<form id="rf" novalidate>${fld('full_name','Full name','text','autocomplete=name')}${fld('email','Email','email','autocomplete=email')}${fld('phone','Phone (+212… or 06…)','tel')}
+ ${fld('campus','Campus','text','autocomplete=organization maxlength=100 placeholder="Type your campus name"')}
+ ${fld('pw','Password (10+ chars, letter &amp; number)','password','autocomplete=new-password')}${fld('pw2','Confirm password','password')}
+ <label style="text-transform:none;letter-spacing:0"><input type="checkbox" id="ok" style="width:auto"> I accept the <a href="#/rules">rules and privacy policy</a></label><div class="err" id="e_ok"></div><button class="btn" ${regOpen()?'':'disabled'}>Create account</button></form>`)},
+login(){setTimeout(()=>{$('#lf').onsubmit=async e=>{e.preventDefault();const{error}=await sb.auth.signInWithPassword({email:val('email').toLowerCase(),password:$('#pw').value});
+ if(error)return $('#e_pw').textContent='Incorrect email or password, or email not yet verified.';await load();location.hash=isAdmin()?'#/admin':'#/dash'};
+ $('#fp').onclick=async e=>{e.preventDefault();const m=val('email');if(!m)return $('#e_email').textContent='Enter your email first.';await sb.auth.resetPasswordForEmail(m,{redirectTo:location.href});toast('If that account exists, a reset link was sent.')}});
+ return shell('Login',`<form id="lf">${fld('email','Email','email')}${fld('pw','Password','password')}<button class="btn">Login</button> <a href="#" id="fp">Forgot password?</a></form>`)},
+async gallery(){const{data:g,error}=await sb.from('public_gallery').select('*').order('submitted_at',{ascending:false});if(error)return'<p>The gallery could not be loaded. Please retry.</p>';
+ let mine=null,voted=null;if(me){mine=(await sb.from('submissions').select('id').eq('participant_id',me.id).maybeSingle()).data?.id;voted=(await sb.from('votes').select('submission_id').maybeSingle()).data}
+ const u=await signed(g.map(x=>x.primary_photo_path));window._g={g,u,mine,voted};window._n=12;
+ const note=!votingOpen()?'Voting is not open right now.':!me?'<a href="#/login">Log in</a> with a verified account to vote.':voted?'Your vote is cast — thank you.':'Each participant may vote once.';
+ setTimeout(()=>{$('#q').oninput=draw;$('#s').onchange=draw;draw()});
+ return`<h2>Gallery &amp; Vote</h2><p class="lbl">${note}</p><p><input id="q" placeholder="Search by name" aria-label="Search" style="max-width:260px"> <select id="s" style="max-width:200px"><option value="n">Newest</option><option value="r">Random</option></select></p><div class="grid" id="gg"></div>`},
+async look(id){const{data:x}=await sb.from('public_gallery').select('*').eq('id',id).maybeSingle();if(!x)return'<p>This look is not available.</p>';const u=await signed([x.primary_photo_path,x.secondary_photo_path]);
+ return`<a href="#/gallery">← Gallery</a><h2>${h(x.title||'Untitled look')}</h2><p class="lbl">${h(x.display_name)} · ${h(x.campus||'')}</p><div class="thumbs"><img style="width:min(100%,380px);height:auto" src="${u[x.primary_photo_path]||''}" alt="${h(x.title||'Makeup look')} — main photo">${x.secondary_photo_path?`<img style="width:min(100%,380px);height:auto" src="${u[x.secondary_photo_path]}" alt="Second photo">`:''}</div><p>${h(x.description||'')}</p>`},
+async results(){const{data:r}=await sb.rpc('get_results');if(!r?.length)return`<div class="panel dark" style="text-align:center"><p class="lbl">The final reveal · 2 November 2026</p><h2>The final reveal awaits.</h2><p class="tag">Our winners will be announced on 2 November.</p></div>`;const u=await signed([]);
+ return`<h2>Results</h2>${!S.results_published?'<p class="lbl">Admin preview — not public yet</p>':'<p class="tag">Congratulations to our chosen ones.</p>'}<div class="panel dark overflow"><table><tr><th>Rank</th><th>Look</th><th>Valid votes</th></tr>${r.map(x=>`<tr><td>${x.rank}</td><td>${h(x.display_name)} — ${h(x.title||'')}</td><td>${x.valid_votes}</td></tr>`).join('')}</table></div>`},
+async dash(){if(!me)return denied();const{data:s}=await sb.from('submissions').select('*').eq('participant_id',me.id).maybeSingle();const u=await signed([s?.primary_photo_path,s?.secondary_photo_path]);
+ const canEdit=subsOpen()&&S.allow_edits&&!s?.locked&&prof.account_status==='active';setTimeout(()=>canEdit&&wireSub(s));
+ return`<h2>Welcome, ${h(prof.full_name.split(' ')[0])}</h2><div class="panel dark"><p>${h(prof.full_name)} · ${h(prof.campus_name||prof.campuses?.name||'')} · Account: <span class="pill">${h(prof.account_status.replace('_',' '))}</span> · Deadline: ${fmt(S.submission_deadline)}</p>
+ ${prof.account_status==='pending_verification'?'<p class="err">Please verify your email (check your inbox) before voting.</p>':''}
+ <p>Entry: <span class="pill">${s?(s.locked?'locked':s.status):'not started'}</span> ${s?.rejection_reason?`— Reason: ${h(s.rejection_reason)}`:''}</p>
+ ${s?`<div class="thumbs"><img src="${u[s.primary_photo_path]||''}" alt="Your main photo">${s.secondary_photo_path?`<img src="${u[s.secondary_photo_path]}" alt="Your second photo">`:''}</div>`:''}
+ <a class="btn ghost" href="#/gallery">View gallery</a></div>
+ ${canEdit?`<div class="panel"><h3>${s?'Edit your entry':'Create your entry'}</h3><form id="sf" novalidate>${fld('title','Title (optional)','text','maxlength=80 value="'+h(s?.title||'')+'"')}<label for="desc">Concept (optional)</label><textarea id="desc" maxlength="1000">${h(s?.description||'')}</textarea>
+ <label for="p1">Primary photo ${s?'(leave empty to keep)':'(required)'}</label><input id="p1" type="file" accept="image/jpeg,image/png,image/webp"><label for="p2">Second photo (optional)</label><input id="p2" type="file" accept="image/jpeg,image/png,image/webp">
+ <div class="thumbs" id="pv"></div><div class="err" id="e_sf"></div><progress id="pg" max="100" value="0" hidden></progress><br><button class="btn">Review &amp; submit</button></form></div>`:'<p>Editing is closed for your entry.</p>'}`},
+async admin(){if(!isAdmin())return denied();const[{data:st},{data:subs},{data:pp},{data:lg}]=await Promise.all([sb.rpc('admin_stats'),sb.from('submissions').select('*,profiles(full_name,campus_name,campuses(name))').order('created_at',{ascending:false}),sb.from('profiles').select('*,campuses(name)').eq('role','participant').order('created_at',{ascending:false}).limit(200),sb.from('audit_logs').select('*').order('created_at',{ascending:false}).limit(15)]);
+ const u=await signed(subs.flatMap(s=>[s.primary_photo_path,s.secondary_photo_path]));window._a={subs,pp};
+ const rate=st.participants?Math.round(100*st.votes/st.participants):0;setTimeout(wireAdmin);
+ return`<h2>Admin</h2><p class="lbl">Status: ${h(status())}</p><div class="grid">${[['Participants',st.participants],['Approved',st.approved],['Pending',st.pending],['Rejected',st.rejected],['Valid votes',st.votes],['Participation',rate+'%']].map(([a,b])=>`<div class="panel dark"><div class="stat">${b}</div>${a}</div>`).join('')}</div>
+ <div class="panel dark"><h3>Participants by campus</h3>${Object.entries(st.by_campus).map(([k,v])=>`<div>${h(k)} <progress max="${st.participants||1}" value="${v}"></progress> ${v}</div>`).join('')||'—'}</div>
+ <div class="panel"><h3>Competition control</h3><p>Submission deadline: <b>${fmt(S.submission_deadline)}</b> · Voting: <b>${S.voting_enabled?'enabled':'disabled'}</b> · Results: <b>${S.results_published?'published':'hidden'}</b></p>
+ <label for="dl">Set submission deadline</label><input id="dl" type="datetime-local" style="max-width:260px"><button class="btn sm" id="setdl">Update deadline</button>
+ <p><button class="btn sm" id="tv">${S.voting_enabled?'Close':'Open'} voting</button><button class="btn sm" id="pub">${S.results_published?'Hide':'Publish'} results</button><button class="btn sm" id="close" style="background:#2a0c10">Close competition now</button></p><div class="err" id="e_ctl"></div></div>
+ <div class="panel dark overflow"><h3>Submissions</h3><table><tr><th>Entry</th><th>Photos</th><th>Status</th><th>Actions</th></tr>${subs.map(s=>`<tr><td>${h(s.profiles?.full_name)}<br>${h(s.profiles?.campus_name||s.profiles?.campuses?.name||'')}<br><i>${h(s.title||'')}</i></td><td class="thumbs"><a href="${u[s.primary_photo_path]}" target="_blank"><img src="${u[s.primary_photo_path]||''}" alt="Primary" style="width:70px;height:90px"></a>${s.secondary_photo_path?`<a href="${u[s.secondary_photo_path]}" target="_blank"><img src="${u[s.secondary_photo_path]}" alt="Secondary" style="width:70px;height:90px"></a>`:''}</td><td><span class="pill">${s.status}</span></td><td><button class="btn sm" data-m="approved" data-id="${s.id}">Approve</button><button class="btn sm ghost" data-m="rejected" data-id="${s.id}">Reject</button></td></tr>`).join('')||'<tr><td colspan=4>No submissions yet.</td></tr>'}</table></div>
+ <div class="panel dark overflow"><h3>Participants</h3><input id="pq" placeholder="Search name, email, phone, campus" style="max-width:320px"><table id="pt"></table></div>
+ <div class="panel dark overflow"><h3>Integrity &amp; exports</h3><p><button class="btn sm" id="vr">Inspect vote records</button><button class="btn sm ghost" id="dup">Review suspected duplicates</button><button class="btn sm ghost" id="xv">Export vote summary CSV</button><button class="btn sm ghost" id="xp">Export participants CSV</button></p><div id="ix"></div></div>
+ <div class="panel dark overflow"><h3>Audit log</h3><table>${lg.map(l=>`<tr><td>${fmt(l.created_at)}</td><td>${h(l.action)}</td><td>${h(l.reason||'')}</td></tr>`).join('')}</table></div>`}};
+const denied=()=>`<div class="panel dark" style="text-align:center"><h2>Access denied</h2><p>The gates remain closed to you. <a href="#/login">Login</a></p></div>`;
+const ERR={voting_closed:'Voting is closed.',already_voted:'You have already voted.',self_vote:'You cannot vote for your own look.',invalid_entry:'This entry is not eligible.',account_not_eligible:'Verify your email and make sure your account is active.',not_authenticated:'Please log in first.'};
+
+function card(x,u,vote){const w=window._g||{};const can=vote&&votingOpen()&&me&&!w.voted&&x.id!==w.mine;
+ return`<article class="card"><a href="#/look/${x.id}"><img loading="lazy" src="${u[x.primary_photo_path]||''}" alt="${h(x.title||'Makeup look')} by ${h(x.display_name)}"></a><div><h3>${h(x.title||'Untitled look')}</h3><span class="lbl">${h(x.display_name)}${x.campus?' · '+h(x.campus):''}</span><p><a class="btn sm ghost" href="#/look/${x.id}">View look</a>${vote?`<button class="btn sm" data-v="${x.id}" ${can?'':'disabled'}>${x.id===w.mine?'Your look':w.voted?(w.voted.submission_id===x.id?'Your vote':'Vote cast'):'Vote for this look'}</button>`:''}</p></div></article>`}
+function draw(){const{g,u}=window._g;let l=g.filter(x=>x.display_name.toLowerCase().includes(($('#q').value||'').toLowerCase()));if($('#s').value==='r')l=l.sort(()=>Math.random()-.5);
+ $('#gg').innerHTML=l.slice(0,window._n).map(x=>card(x,u,true)).join('')||'<p>No looks to show yet.</p>';if(l.length>window._n){$('#gg').insertAdjacentHTML('afterend','<p id="mw" style="text-align:center"><button class="btn" id="more">Load more</button></p>');$('#more').onclick=()=>{window._n+=12;$('#mw').remove();draw()}}
+ document.querySelectorAll('[data-v]').forEach(b=>b.onclick=async()=>{const x=g.find(y=>y.id===b.dataset.v);
+  if(!await ask(`<h3>Vote for this look?</h3><img src="${u[x.primary_photo_path]}" alt="" style="width:100%"><p>${h(x.title||'Untitled')} by ${h(x.display_name)}</p><p>Each participant may vote only once. This cannot be undone.</p>`))return;
+  const{data,error}=await sb.rpc('cast_vote',{p_submission:x.id});if(error||!data?.ok)return toast(ERR[data?.error]||'Vote failed. Please try again.');
+  toast('Your vote is recorded. Thank you!');route()})}
+
+async function reg(e){e.preventDefault();document.querySelectorAll('.err').forEach(x=>x.textContent='');const E=(k,m)=>($('#e_'+k).textContent=m,1);let bad=0;
+ let ph=val('phone').replace(/[\s().-]/g,'');if(/^0[5-7]\d{8}$/.test(ph))ph='+212'+ph.slice(1);else if(ph.startsWith('00'))ph='+'+ph.slice(2);
+ if(val('full_name').length<2)bad=E('full_name','Enter your full name.');if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(val('email')))bad=E('email','Enter a valid email.');
+ if(!/^\+[1-9]\d{7,14}$/.test(ph))bad=E('phone','Enter a valid Moroccan or international number.');
+ const campus=val('campus');if(!campus)bad=E('campus','Enter your campus name.');else if(campus.length>100)bad=E('campus','Campus name must be 100 characters or fewer.');
+ const p=$('#pw').value;if(p.length<10||!/[A-Za-z]/.test(p)||!/\d/.test(p))bad=E('pw','At least 10 characters with a letter and a number.');if(p!==$('#pw2').value)bad=E('pw2','Passwords do not match.');
+ if(!$('#ok').checked)bad=E('ok','You must accept the rules and privacy policy.');if(bad)return;
+ const{error}=await sb.auth.signUp({email:val('email').toLowerCase(),password:p,options:{emailRedirectTo:location.origin+location.pathname,data:{full_name:val('full_name'),phone:ph,campus_name:campus}}});
+ if(error)return $('#e_ok').textContent='We could not create this account. If you already registered, try logging in.';
+ app.innerHTML=shell('Check your inbox','<p>We sent a verification link. Verify your email, then log in.</p>')}
+
+function wireSub(s){const ok=['image/jpeg','image/png','image/webp'],max=(S.max_photo_mb||5)*1048576;
+ const chk=f=>f&&(!ok.includes(f.type)?'Only JPEG, PNG or WebP.':f.size>max?`Max ${S.max_photo_mb||5} MB per photo.`:'');
+ const pv=()=>{$('#pv').innerHTML=['p1','p2'].map(i=>$('#'+i).files[0]?`<img src="${URL.createObjectURL($('#'+i).files[0])}" alt="Preview">`:'').join('')};$('#p1').onchange=pv;$('#p2').onchange=pv;
+ const shrink=f=>new Promise(r=>{const i=new Image();i.onload=()=>{const k=Math.min(1,1600/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=i.width*k;c.height=i.height*k;c.getContext('2d').drawImage(i,0,0,c.width,c.height);c.toBlob(b=>r(b||f),'image/webp',.85)};i.onerror=()=>r(null);i.src=URL.createObjectURL(f)});
+ const up=async f=>{const b=await shrink(f);if(!b)throw new Error('This image is corrupted or unreadable.');const t=b.type||f.type,path=`${me.id}/${crypto.randomUUID()}.${t.split('/')[1]}`;const{error}=await sb.storage.from('submissions').upload(path,b,{contentType:t});if(error)throw error;return path};
+ $('#sf').onsubmit=async e=>{e.preventDefault();const f1=$('#p1').files[0],f2=$('#p2').files[0],E=m=>$('#e_sf').textContent=m;E('');
+  if(!s&&!f1)return E('A primary photo is required.');const bad=chk(f1)||chk(f2);if(bad)return E(bad);
+  if(!await ask('<h3>Submit your entry?</h3><p>Your look will be reviewed by the AURORA team before it appears in the gallery.</p>'))return;
+  try{$('#pg').hidden=false;$('#pg').removeAttribute('value');const a=f1?await up(f1):s.primary_photo_path,b=f2?await up(f2):s?.secondary_photo_path||null;
+   const{error}=await sb.from('submissions').upsert({participant_id:me.id,title:val('title')||null,description:$('#desc').value.trim()||null,primary_photo_path:a,secondary_photo_path:b,status:'pending',submitted_at:new Date().toISOString()},{onConflict:'participant_id'});
+   if(error)throw error;toast('Entry submitted for review.');route()}catch(x){$('#pg').hidden=true;E('Upload failed: '+(x.message||'please try again.'))}}}
+
+function wireAdmin(){const R=async(fn,args,msg)=>{const{error}=await sb.rpc(fn,args);if(error)return $('#e_ctl').textContent=error.message;toast(msg);route()};
+ $('#close').onclick=async()=>{const r=prompt('Reason for closing the competition now (required):');if(!r)return;if(await ask('<h3>Close the competition?</h3><p>Voting stops immediately and all entries are locked. This is logged.</p>'))R('admin_close_competition',{p_reason:r},'Competition closed.')};
+ $('#setdl').onclick=()=>{const v=$('#dl').value;if(!v)return;const r=prompt('Reason for changing the deadline:');if(r)R('admin_set_deadline',{p_ts:new Date(v).toISOString(),p_reason:r},'Deadline updated.')};
+ $('#tv').onclick=()=>{const r=prompt('Reason:');if(r)R('admin_set_voting',{p_enabled:!S.voting_enabled,p_reason:r},'Voting updated.')};
+ $('#pub').onclick=()=>{const r=prompt('Reason:');if(r)R('admin_publish_results',{p_pub:!S.results_published,p_reason:r},'Results updated.')};
+ document.querySelectorAll('[data-m]').forEach(b=>b.onclick=()=>{const m=b.dataset.m;const r=m==='rejected'?prompt('Rejection reason (shown to participant):'):'approved';if(!r)return;R('admin_moderate',{p_id:b.dataset.id,p_status:m,p_reason:r},'Saved.')});
+ const dp=()=>{const q=$('#pq').value.toLowerCase();$('#pt').innerHTML=window._a.pp.filter(p=>[p.full_name,p.normalized_email,p.normalized_phone,p.campus_name,p.campuses?.name].join(' ').toLowerCase().includes(q)).map(p=>`<tr><td>${h(p.full_name)}<br>${h(p.normalized_email)}<br>${h(p.normalized_phone||'')}</td><td>${h(p.campus_name||p.campuses?.name||'')}</td><td><span class="pill">${h(p.account_status)}</span></td><td><button class="btn sm ghost" data-a="${p.id}" data-s="${p.account_status==='suspended'?'active':'suspended'}">${p.account_status==='suspended'?'Reactivate':'Suspend'}</button></td></tr>`).join('');
+  document.querySelectorAll('[data-a]').forEach(b=>b.onclick=()=>{const r=prompt('Reason (recorded):');if(r)R('admin_set_account',{p_id:b.dataset.a,p_status:b.dataset.s,p_reason:r},'Account updated.')})};$('#pq').oninput=dp;dp();wireIx(R)}
+function csv(name,rows){if(!rows?.length)return toast('Nothing to export.');const k=Object.keys(rows[0]),q=v=>'"'+String(v??'').replace(/"/g,'""').replace(/^([=+\-@])/,"'$1")+'"';const t=[k.join(','),...rows.map(r=>k.map(c=>q(r[c])).join(','))].join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/csv'}));a.download=name;a.click()}
+function wireIx(R){
+ $('#xv').onclick=async()=>{const{data}=await sb.rpc('admin_vote_summary');csv('vote-summary.csv',data)};
+ $('#xp').onclick=()=>csv('participants.csv',window._a.pp.map(p=>({name:p.full_name,email:p.normalized_email,phone:p.normalized_phone,campus:p.campus_name||p.campuses?.name,status:p.account_status})));
+ $('#dup').onclick=async()=>{const{data}=await sb.rpc('admin_duplicates');$('#ix').innerHTML=data?.length?'<table>'+data.map(d=>`<tr><td>${h(d.reason)}</td><td>${h(d.full_name)}<br>${h(d.email)} ${h(d.phone||'')}</td><td>${h(d.campus||'')}</td></tr>`).join('')+'</table><p>Review manually. Suspend (with a reason) only once confirmed.</p>':'<p>No suspected duplicates.</p>'};
+ $('#vr').onclick=async()=>{const{data}=await sb.rpc('admin_vote_records');$('#ix').innerHTML=data?.length?'<table><tr><th>Voter</th><th>Entry</th><th>Status</th><th>When</th><th></th></tr>'+data.map(v=>`<tr><td>${h(v.voter)}</td><td>${h(v.entry)}</td><td><span class="pill">${h(v.vote_status)}</span></td><td>${fmt(v.voted_at)}</td><td>${v.vote_status==='valid'?`<button class="btn sm ghost" data-iv="${v.vote_id}">Invalidate</button>`:''}</td></tr>`).join('')+'</table>':'<p>No votes yet.</p>';
+  document.querySelectorAll('[data-iv]').forEach(b=>b.onclick=()=>{const r=prompt('Reason for invalidating this vote (required, audited):');if(r)R('admin_invalidate_vote',{p_vote:b.dataset.iv,p_reason:r},'Vote invalidated.')})}}
+
+async function route(){const[,r,a]=(location.hash||'#/').slice(1).split('/');app.innerHTML='<p>Loading…</p>';
+ try{app.innerHTML=await(V[r||'home']||V.home)(a)}catch(e){console.error(e);app.innerHTML='<div class="panel dark"><h2>Something went wrong</h2><p>Please refresh and try again.</p></div>'}window.scrollTo(0,0)}
+(async()=>{const{data:{session}}=await sb.auth.getSession();me=session?.user||null;await load();sb.auth.onAuthStateChange(async(ev)=>{if(ev==='SIGNED_IN'||ev==='SIGNED_OUT'||ev==='TOKEN_REFRESHED'){const{data:{session:s}}=await sb.auth.getSession();if((s?.user?.id||null)!==(me?.id||null)){me=s?.user||null;await load();route()}}});addEventListener('hashchange',route);route()})();
+</script></body></html>
