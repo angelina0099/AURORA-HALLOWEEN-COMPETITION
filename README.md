@@ -5,7 +5,7 @@ Done: database schema, RLS, atomic voting function, storage policies (`supabase/
 To build next: Next.js UI (pages in the spec), Zod-validated server actions, rate limiting, admin dashboard, tests.
 
 ## Setup
-1. Create a Supabase project. Auth → enable Email provider with "Confirm email" ON; set Site URL and redirect URLs.
+1. In Supabase Auth → URL Configuration, set the Site URL to `https://aurora-alpha-neon.vercel.app` and add `https://aurora-alpha-neon.vercel.app/**` to the redirect URL allowlist. Keep email confirmations enabled. The registration flow redirects confirmed users back to the site.
 2. In the Supabase SQL Editor, run the files in `supabase/migrations/` in numeric order (`0001` through `0005`), or link this repository once with `supabase link --project-ref <project-ref>` and then run `supabase db push` from the repository root.
 3. Copy `.env.example` to `.env.local` and fill the values. Keep the service-role key server-side only.
 4. Campus names are typed during registration. Existing campus records remain available; matching typed names are linked automatically.
@@ -32,7 +32,7 @@ The static site is built for Vercel from `web/` into `dist/`. Set `NEXT_PUBLIC_S
 For local builds, set those two variables in your shell and run `npm run build`. The generated `dist/` folder is ignored by Git.
 
 ## Deploy with GitHub and Vercel
-Import the GitHub repository into Vercel with the repository root as the project root. Vercel uses `npm run build` and publishes `dist/` as configured in `vercel.json`. Add `NEXT_PUBLIC_SUPABASE_URL` (`https://<project-ref>.supabase.co`) and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (the project's publishable/anon key) to the Vercel project's environment variables, then deploy. Afterward, add the deployed site URL to Supabase Auth's Site URL and redirect URLs. Do not add a service-role key to this static frontend.
+Import the GitHub repository into Vercel with the repository root as the project root. Vercel uses `npm run build` and publishes `dist/` as configured in `vercel.json`. Add `NEXT_PUBLIC_SUPABASE_URL` (`https://<project-ref>.supabase.co`) and `NEXT_PUBLIC_SUPABASE_ANON_KEY` (the project's publishable/anon key) to the Vercel project's environment variables, then deploy. Do not add a service-role key to this static frontend.
 Run the migrations in numeric order before using the site. In Supabase Auth settings add your site URL to the redirect URLs.
 Admin controls: Close competition now (reason required, voting stops, entries locked), change submission deadline, open/close voting, publish/hide results, approve/reject, suspend/reactivate. All are audited.
 
