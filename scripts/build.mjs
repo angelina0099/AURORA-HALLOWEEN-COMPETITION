@@ -2,6 +2,7 @@ import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error(
@@ -12,12 +13,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 const html = await readFile("web/index.html", "utf8");
 const configuredHtml = html
   .replace("'YOUR_SUPABASE_URL'", JSON.stringify(supabaseUrl))
-  .replace("'YOUR_SUPABASE_ANON_KEY'", JSON.stringify(supabaseAnonKey));
+  .replace("'YOUR_SUPABASE_ANON_KEY'", JSON.stringify(supabaseAnonKey))
+  .replace("'YOUR_TURNSTILE_SITE_KEY'", JSON.stringify(turnstileSiteKey));
 
 if (
   configuredHtml === html ||
   configuredHtml.includes("YOUR_SUPABASE_URL") ||
-  configuredHtml.includes("YOUR_SUPABASE_ANON_KEY")
+  configuredHtml.includes("YOUR_SUPABASE_ANON_KEY") ||
+  configuredHtml.includes("YOUR_TURNSTILE_SITE_KEY")
 ) {
   throw new Error("Supabase configuration placeholders were not found in web/index.html.");
 }
