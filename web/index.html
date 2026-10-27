@@ -87,7 +87,7 @@ const subsOpen=()=>!S.submission_deadline||now()<T(S.submission_deadline);
 const regOpen=()=>(!S.registration_opens||now()>=T(S.registration_opens))&&(!S.registration_closes||now()<=T(S.registration_closes));
 const status=()=>S.results_published?'Results published':votingOpen()?'Voting open':subsOpen()?'Submissions open':'Competition closed';
 const isAdmin=()=>prof?.role==='admin';
-const signed=async paths=>{const p=paths.filter(Boolean);if(!p.length)return{};const{data}=await sb.storage.from('submissions').createSignedUrls(p,3600);return Object.fromEntries((data||[]).map(x=>[x.path,x.signedUrl]))};
+const signed=async paths=>{const p=paths.filter(Boolean);if(!p.length)return{};const{data,error}=await sb.storage.from('submissions').createSignedUrls(p,3600);if(error){console.error('Photo signing failed:',error);throw new Error('Photos could not be loaded. Please refresh and try again.')}const failures=(data||[]).filter(x=>x.error||!x.signedUrl);if(failures.length){console.error('Some uploaded photos could not be signed:',failures);throw new Error('Some photos could not be loaded. Please refresh and try again.')}return Object.fromEntries((data||[]).map(x=>[x.path,x.signedUrl]))};
 const shell=(t,b)=>`<div class="panel form"><h2>${t}</h2>${b}</div>`;
 const fld=(id,l,t='text',x='')=>`<label for="${id}">${l}</label><input id="${id}" type="${t}" ${x}><div class="err" id="e_${id}"></div>`;
 const val=id=>$('#'+id)?.value.trim();
@@ -98,7 +98,7 @@ async function load(){const{data}=await sb.from('competition_settings').select('
  $('#contact').textContent=S.contact_email||'';
  $('#nav').innerHTML=`<a class="logo" href="#/"><img class="brand-mark" src="aurora-logo.png" alt="">AURORA</a><a href="#/">Home</a><a href="#/rules">The Competition</a><a href="#/gallery">Gallery &amp; Vote</a><a href="#/results">Results</a>`+
  (me?`<a href="#/dash">My Account</a>${isAdmin()?'<a href="#/admin">Admin</a>':''}<a href="#" id="out">Logout</a>`:`<a href="#/login">Login</a>${regOpen()?'<a href="#/register">Register</a>':''}`);
- $('#out')&&($('#out').onclick=async e=>{e.preventDefault();await sb.auth.signOut();location.hash='#/'})}
+ $('#out')&&($('#out').onclick=async e=>{e.preventDefault();const{error}=await sb.auth.signOut();if(error){console.error('Sign-out failed:',error);toast('Unable to log out. Please try again.')}})}
 
 const V={
 async home(){const st=Array.from({length:40},()=>`<i class="star" style="left:${Math.random()*100}%;top:${Math.random()*100}%;animation-delay:${Math.random()*4}s"></i>`).join('');
@@ -142,6 +142,7 @@ async dash(){if(!me)return denied();const{data:s}=await sb.from('submissions').s
  return`<h2>Welcome, ${h(prof.full_name.split(' ')[0])}</h2><div class="panel dark"><p>${h(prof.full_name)} · ${h(prof.campus_name||prof.campuses?.name||'')} · Account: <span class="pill">${h(prof.account_status.replace('_',' '))}</span> · Deadline: ${fmt(S.submission_deadline)}</p>
  ${prof.account_status==='pending_verification'?'<p class="err">Please verify your email (check your inbox) before voting.</p>':''}
  <p>Entry: <span class="pill">${s?(s.locked?'locked':s.status):'not started'}</span> ${s?.rejection_reason?`— Reason: ${h(s.rejection_reason)}`:''}</p>
+ ${s?.status==='pending'?'<p>Your entry has been received and is awaiting admin review. It will appear in the public gallery after it is approved.</p>':s?.status==='approved'?'<p>Your entry is approved and visible in the public gallery.</p>':''}
  ${s?`<div class="thumbs"><img src="${u[s.primary_photo_path]||''}" alt="Your main photo">${s.secondary_photo_path?`<img src="${u[s.secondary_photo_path]}" alt="Your second photo">`:''}</div>`:''}
  <a class="btn ghost" href="#/gallery">View gallery</a></div>
  ${canEdit?`<div class="panel"><h3>${s?'Edit your entry':'Create your entry'}</h3><form id="sf" novalidate>${fld('title','Title (optional)','text','maxlength=80 value="'+h(s?.title||'')+'"')}<label for="desc">Concept (optional)</label><textarea id="desc" maxlength="1000">${h(s?.description||'')}</textarea>
@@ -165,7 +166,7 @@ const ERR={voting_closed:'Voting is closed.',already_voted:'You have already vot
 function card(x,u,vote){const w=window._g||{};const can=vote&&votingOpen()&&me&&!w.voted&&x.id!==w.mine;
  return`<article class="card"><a href="#/look/${x.id}"><img loading="lazy" src="${u[x.primary_photo_path]||''}" alt="${h(x.title||'Makeup look')} by ${h(x.display_name)}"></a><div><h3>${h(x.title||'Untitled look')}</h3><span class="lbl">${h(x.display_name)}${x.campus?' · '+h(x.campus):''}</span><p><a class="btn sm ghost" href="#/look/${x.id}">View look</a>${vote?`<button class="btn sm" data-v="${x.id}" ${can?'':'disabled'}>${x.id===w.mine?'Your look':w.voted?(w.voted.submission_id===x.id?'Your vote':'Vote cast'):'Vote for this look'}</button>`:''}</p></div></article>`}
 function draw(){const{g,u}=window._g;let l=g.filter(x=>x.display_name.toLowerCase().includes(($('#q').value||'').toLowerCase()));if($('#s').value==='r')l=l.sort(()=>Math.random()-.5);
- $('#gg').innerHTML=l.slice(0,window._n).map(x=>card(x,u,true)).join('')||'<p>No looks to show yet.</p>';if(l.length>window._n){$('#gg').insertAdjacentHTML('afterend','<p id="mw" style="text-align:center"><button class="btn" id="more">Load more</button></p>');$('#more').onclick=()=>{window._n+=12;$('#mw').remove();draw()}}
+ $('#gg').innerHTML=l.slice(0,window._n).map(x=>card(x,u,true)).join('')||'<p>No approved looks are available yet. New submissions appear here after admin review.</p>';if(l.length>window._n){$('#gg').insertAdjacentHTML('afterend','<p id="mw" style="text-align:center"><button class="btn" id="more">Load more</button></p>');$('#more').onclick=()=>{window._n+=12;$('#mw').remove();draw()}}
  document.querySelectorAll('[data-v]').forEach(b=>b.onclick=async()=>{const x=g.find(y=>y.id===b.dataset.v);
   if(!await ask(`<h3>Vote for this look?</h3><img src="${u[x.primary_photo_path]}" alt="" style="width:100%"><p>${h(x.title||'Untitled')} by ${h(x.display_name)}</p><p>Each participant may vote only once. This cannot be undone.</p>`))return;
   const{data,error}=await sb.rpc('cast_vote',{p_submission:x.id});if(error||!data?.ok)return toast(ERR[data?.error]||'Vote failed. Please try again.');
@@ -211,6 +212,6 @@ function wireIx(R){
   document.querySelectorAll('[data-iv]').forEach(b=>b.onclick=()=>{const r=prompt('Reason for invalidating this vote (required, audited):');if(r)R('admin_invalidate_vote',{p_vote:b.dataset.iv,p_reason:r},'Vote invalidated.')})}}
 
 async function route(){const[,r,a]=(location.hash||'#/').slice(1).split('/');app.innerHTML='<p>Loading…</p>';
- try{app.innerHTML=await(V[r||'home']||V.home)(a)}catch(e){console.error(e);app.innerHTML='<div class="panel dark"><h2>Something went wrong</h2><p>Please refresh and try again.</p></div>'}window.scrollTo(0,0)}
-(async()=>{const{data:{session}}=await sb.auth.getSession();me=session?.user||null;await load();sb.auth.onAuthStateChange(async(ev)=>{if(ev==='SIGNED_IN'||ev==='SIGNED_OUT'||ev==='TOKEN_REFRESHED'){const{data:{session:s}}=await sb.auth.getSession();if((s?.user?.id||null)!==(me?.id||null)){me=s?.user||null;await load();route()}}});addEventListener('hashchange',route);route()})();
+ try{app.innerHTML=await(V[r||'home']||V.home)(a)}catch(e){console.error(e);app.innerHTML=`<div class="panel dark"><h2>Something went wrong</h2><p>${h(e?.message||'Please refresh and try again.')}</p></div>`}window.scrollTo(0,0)}
+(async()=>{const{data:{session}}=await sb.auth.getSession();me=session?.user||null;await load();sb.auth.onAuthStateChange((ev,session)=>{if(ev==='SIGNED_IN'||ev==='SIGNED_OUT'||ev==='TOKEN_REFRESHED'){const user=session?.user||null;if((user?.id||null)!==(me?.id||null)){setTimeout(async()=>{me=user;await load();if(ev==='SIGNED_OUT'&&location.hash!=='#/'){location.hash='#/';return}await route()},0)}}});addEventListener('hashchange',route);route()})();
 </script></body></html>
