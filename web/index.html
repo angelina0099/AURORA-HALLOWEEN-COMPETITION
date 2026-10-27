@@ -77,6 +77,8 @@ footer{text-align:center;padding:2rem;border-top:1px solid #C89A9833;color:var(-
 // ===== CONFIG: paste your Supabase values (anon key is safe in the browser; NEVER the service-role key) =====
 const SB_URL='YOUR_SUPABASE_URL', SB_KEY='YOUR_SUPABASE_ANON_KEY';
 const sb=supabase.createClient(SB_URL,SB_KEY);
+const TURNSTILE_SITE_KEY='YOUR_TURNSTILE_SITE_KEY';
+let turnstilePromise=null,turnstileWidgetId=null,turnstileToken=null;
 const $=s=>document.querySelector(s), app=$('#app'); let me=null,prof=null,S={};
 const h=s=>String(s??'').replace(/[&<>"']/g,c=>'&#'+c.charCodeAt(0)+';');
 const toast=m=>{const t=$('#toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',4000)};
@@ -92,6 +94,8 @@ const shell=(t,b)=>`<div class="panel form"><h2>${t}</h2>${b}</div>`;
 const fld=(id,l,t='text',x='')=>`<label for="${id}">${l}</label><input id="${id}" type="${t}" ${x}><div class="err" id="e_${id}"></div>`;
 const val=id=>$('#'+id)?.value.trim();
 function ask(html){return new Promise(r=>{const d=$('#dlg');d.innerHTML=html+'<p><button class="btn" id="y">Confirm</button><button class="btn ghost" id="n">Cancel</button></p>';d.showModal();$('#y').onclick=()=>{d.close();r(true)};$('#n').onclick=()=>{d.close();r(false)}})}
+function loadTurnstile(){if(window.turnstile)return Promise.resolve(window.turnstile);if(!turnstilePromise)turnstilePromise=new Promise((resolve,reject)=>{const s=document.createElement('script');s.src='https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';s.async=true;s.defer=true;s.onload=()=>window.turnstile?resolve(window.turnstile):reject(new Error('Turnstile did not initialize'));s.onerror=()=>{turnstilePromise=null;reject(new Error('Turnstile could not load'))};document.head.appendChild(s)});return turnstilePromise}
+async function setupTurnstile(){if(!TURNSTILE_SITE_KEY)return;try{const api=await loadTurnstile();if(!$('#captcha'))return;turnstileWidgetId=api.render('#captcha',{sitekey:TURNSTILE_SITE_KEY,callback:t=>{turnstileToken=t;$('#e_captcha').textContent=''},'expired-callback':()=>{turnstileToken=null},'error-callback':()=>{turnstileToken=null;$('#e_captcha').textContent='The security check failed to load. Refresh the check and try again.'}})}catch(error){console.error('Signup security check failed to load:',error);if($('#e_captcha'))$('#e_captcha').textContent='The security check could not load. Check your connection and refresh the page.'}}
 
 async function load(){const{data}=await sb.from('competition_settings').select('*').single();S=data||{};
  if(me){const{data:p}=await sb.from('profiles').select('*,campuses(name)').eq('id',me.id).single();prof=p}else prof=null;
@@ -119,9 +123,9 @@ rules(){return`<section class="rules-hero"><p class="rules-kicker">AURORA · EMs
  </div></section>
  <section class="rules-section privacy-note"><p class="rules-kicker">Your information, respected</p><h2>Privacy &amp; photo display</h2><p>We collect your name, email, phone number and campus to administer the competition. Your email address and phone number are not shown publicly. Approved entries appear with your first name and last initial alongside your photos.</p><p>For privacy questions or a deletion request, contact <a href="mailto:${h(S.contact_email||'')}">${h(S.contact_email||'the competition team')}</a>.</p></section>
  <div class="rules-cta"><p class="tag">Your imagination is the main event.</p><a class="btn" href="#/${me?'dash':'register'}">Enter the competition</a>${me?'<a class="btn ghost" href="#/gallery">Explore the gallery &amp; vote</a>':''}</div>`},
-async register(){setTimeout(()=>$('#rf').onsubmit=reg);return shell('Register',`<form id="rf" novalidate>${fld('full_name','Full name','text','autocomplete=name maxlength=100')}${fld('email','Email','email','autocomplete=email')}${fld('phone','Phone (+212… or 06…)','tel','maxlength=30')}
+async register(){setTimeout(()=>{$('#rf').onsubmit=reg;setupTurnstile()});return shell('Register',`<form id="rf" novalidate>${fld('full_name','Full name','text','autocomplete=name maxlength=100')}${fld('email','Email','email','autocomplete=email')}${fld('phone','Phone (+212… or 06…)','tel','maxlength=30')}
  ${fld('campus','Campus','text','autocomplete=organization maxlength=100 placeholder="Type your campus name"')}
- ${fld('pw','Password (10+ chars, letter &amp; number)','password','autocomplete=new-password')}${fld('pw2','Confirm password','password')}
+ ${fld('pw','Password (10+ chars, letter &amp; number)','password','autocomplete=new-password')}${fld('pw2','Confirm password','password')}${TURNSTILE_SITE_KEY?'<div id="captcha"></div><div class="err" id="e_captcha"></div>':''}
  <label style="text-transform:none;letter-spacing:0"><input type="checkbox" id="ok" style="width:auto"> I accept the <a href="#/rules">rules and privacy policy</a></label><div class="err" id="e_ok"></div><button class="btn" ${regOpen()?'':'disabled'}>Create account</button></form>`)},
 login(){setTimeout(()=>{$('#lf').onsubmit=async e=>{e.preventDefault();const{error}=await sb.auth.signInWithPassword({email:val('email').toLowerCase(),password:$('#pw').value});
  if(error)return $('#e_pw').textContent='Incorrect email or password, or email not yet verified.';await load();location.hash=isAdmin()?'#/admin':'#/dash'};
@@ -180,6 +184,7 @@ function signupError(error){const code=String(error?.code||'').toLowerCase(),mes
  if(code.includes('weak_password')||message.includes('password should'))return'Choose a stronger password with at least 10 characters, including a letter and a number.';
  if(code.includes('signup_disabled')||message.includes('signups not allowed'))return'Registration is currently unavailable. Please contact the competition team.';
  if(status===429||code.includes('rate_limit')||message.includes('rate limit'))return'Too many signup attempts. Wait a few minutes, then try again.';
+ if(code.includes('captcha')||message.includes('captcha')||message.includes('challenge'))return'The security check expired or failed. Complete it again, then retry.';
  if(message.includes('redirect')&&message.includes('allow'))return'The signup confirmation redirect is not configured. Please contact the competition team.';
  if(status>=500||message.includes('database error saving new user')||message.includes('profiles_'))return'We could not save your participant details. Check that your phone number is not already registered and that your name and campus are valid. If it persists, contact the competition team.';
  if(status>=400)return'The registration service rejected these details. Check your email, phone number, and password, then try again.';
@@ -191,14 +196,15 @@ async function reg(e){e.preventDefault();document.querySelectorAll('.err').forEa
  if(!/^\+[1-9]\d{7,14}$/.test(ph))bad=E('phone','Enter a valid Moroccan or international number.');
  const campus=val('campus');if(!campus)bad=E('campus','Enter your campus name.');else if(campus.length>100)bad=E('campus','Campus name must be 100 characters or fewer.');
  const p=$('#pw').value;if(p.length<10||!/[A-Za-z]/.test(p)||!/\d/.test(p))bad=E('pw','At least 10 characters with a letter and a number.');if(p!==$('#pw2').value)bad=E('pw2','Passwords do not match.');
+ if(TURNSTILE_SITE_KEY&&!turnstileToken)bad=E('captcha','Complete the security check before continuing.');
  if(!$('#ok').checked)bad=E('ok','You must accept the rules and privacy policy.');if(bad)return;
  const button=$('#rf button');button.disabled=true;button.textContent='Creating account…';
- try{const{data,error}=await sb.auth.signUp({email,password:p,options:{emailRedirectTo:`${location.origin}${location.pathname}?email-confirmed=1`,data:{full_name:name,phone:ph,campus_name:campus}}});
+ try{const{data,error}=await sb.auth.signUp({email,password:p,options:{emailRedirectTo:`${location.origin}${location.pathname}?email-confirmed=1`,data:{full_name:name,phone:ph,campus_name:campus},...(TURNSTILE_SITE_KEY?{captchaToken:turnstileToken}:{})}});
   if(error){console.error('Registration failed:',{code:error.code,status:error.status});$('#e_ok').textContent=signupError(error);return}
   if(data.user?.identities?.length===0){$('#e_ok').textContent='An account may already use this email. Try logging in or resetting your password.';return}
   app.innerHTML=shell('Check your inbox','<p>We sent a verification link. Verify your email, then log in.</p>')
  }catch(error){console.error('Registration request failed:',{name:error?.name});$('#e_ok').textContent=signupError(error)}
- finally{if($('#rf button')){button.disabled=false;button.textContent='Create account'}}}
+ finally{if(TURNSTILE_SITE_KEY&&turnstileWidgetId!==null&&window.turnstile&&$('#rf')){window.turnstile.reset(turnstileWidgetId);turnstileToken=null}if($('#rf button')){button.disabled=false;button.textContent='Create account'}}}
 
 function wireSub(s){const ok=['image/jpeg','image/png','image/webp'],max=(S.max_photo_mb||5)*1048576;
  const chk=f=>f&&(!ok.includes(f.type)?'Only JPEG, PNG or WebP.':f.size>max?`Max ${S.max_photo_mb||5} MB per photo.`:'');
